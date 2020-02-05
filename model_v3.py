@@ -26,7 +26,7 @@ from app_IO import DNaseDataset
 from torch.utils.data import DataLoader
 
 class CR_VAE(nn.Module):
-    def __init__(self, dims, n_centroids, bn=False, dropout=0, binary=True):
+    def __init__(self, dims, n_centroids, bn=False, dropout=0.2, binary=True):
         super(CR_VAE, self).__init__()
 
         [x_dim, z_dim, encode_dim, decode_dim] = dims
@@ -160,7 +160,7 @@ class CR_VAE(nn.Module):
         loss_record = open("/%s/%s_loss_record.txt" %(outdir,name),'wt')
         epoch_loss = []
 
-        for i in range(16):
+        for i in range(10):
             for input_file_name,expected_file_name in files:
                 dataset = DNaseDataset(input_file_name,expected_file_name,transpose = False)
                 loader_params = {'batch_size': batch_size, 'shuffle': True,'num_workers': 16, 'drop_last': True, 'pin_memory': True}
@@ -184,7 +184,7 @@ class CR_VAE(nn.Module):
                 loss_record.write("%s\n" %str(file_loss))
                 epoch_loss.append(file_loss)
 
-            if len(epoch_loss)>800 and (np.sum(epoch_loss[-50:])/np.sum(epoch_loss[-100:-50]))>0.999:
+            if len(epoch_loss)>2400 and (np.sum(epoch_loss[-50:])/np.sum(epoch_loss[-100:-50]))>0.9999:
                 loss_record.write('EarlyStopping: run {} epochs'.format(len(epoch_loss)))
                 break
                         #early_stopping(epoch_loss, self)
